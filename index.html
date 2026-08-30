@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GDS Off Tracker</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#f4f5f7;color:#18202a}
+header{background:#111827;color:#fff;padding:18px 16px}h1{margin:0;font-size:22px}header p{margin:4px 0 0;color:#cbd5e1;font-size:13px}
+main{max-width:900px;margin:auto;padding:14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.card,.panel{background:#fff;border:1px solid #e0e4e8;border-radius:14px;padding:13px}.label{font-size:11px;color:#6b7280}.value{font-size:24px;font-weight:800;margin-top:3px}
+.calendar{margin-top:12px}.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.nav button,button,select,input{border:1px solid #d8dde3;border-radius:9px;background:#fff;padding:8px 10px;font:inherit}.month{font-weight:800}
+.dow,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.dow div{text-align:center;color:#68727d;font-size:11px;padding:4px}.day{min-height:70px;border:1px solid #dfe3e8;border-radius:9px;padding:6px;cursor:pointer;background:#fff}.day.empty{border:0;background:transparent}.day .n{font-weight:750;font-size:13px}.tag{font-size:9px;margin-top:7px;line-height:1.2}.work{background:#eef6ff}.off{background:#eefbf1}.holiday{background:#fff8df}.comp{background:#f3edff}.leave{background:#fff0f0}.workedholiday{background:#e9f8f5}
+.today{outline:2px solid #2457d6}.future{opacity:.9}.muted{color:#6b7280;font-size:12px}.panel{margin-top:12px}.row{display:flex;gap:8px;flex-wrap:wrap}.primary{background:#2457d6;color:white;border-color:#2457d6}.danger{color:#a11;background:#fff}.legend{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.pill{font-size:10px;padding:5px 8px;border:1px solid #e0e4e8;border-radius:99px}
+@media(max-width:600px){.stats{grid-template-columns:1fr 1fr}.stats .card:last-child{grid-column:1/-1}.day{min-height:61px}.tag{font-size:8px}}
+</style></head>
+<body>
+<header><h1>GDS Off Tracker</h1><p>Manual calendar • 6 shifts → 1 regular off • holidays are whatever you mark them as</p></header>
+<main>
+<div class="stats">
+<div class="card"><div class="label">Pending regular offs</div><div class="value" id="pending">0</div></div>
+<div class="card"><div class="label">Shift progress</div><div class="value" id="streak">0 / 6</div></div>
+<div class="card"><div class="label">Comp-offs</div><div class="value" id="comp">0</div></div>
+</div>
+
+<div class="panel calendar">
+<div class="nav"><button onclick="move(-1)">‹</button><div class="month" id="title"></div><button onclick="move(1)">›</button></div>
+<div class="dow"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
+<div class="days" id="days"></div>
+<div class="legend"><span class="pill">🟦 Shift</span><span class="pill">🟩 Off</span><span class="pill">🟨 Holiday</span><span class="pill">🟪 Comp-off</span><span class="pill">🟥 Leave</span><span class="pill">🟫 Worked holiday</span></div>
+</div>
+
+<div class="panel">
+<h3 style="margin:0 0 10px">Mark a date</h3>
+<div class="row">
+<input type="date" id="date"><select id="status">
+<option value="unmarked">Unmarked</option><option value="work">Shift</option><option value="off">Regular Off</option><option value="holiday">Holiday</option><option value="workedholiday">Worked Holiday (+ comp-off)</option><option value="comp">Comp-off Used</option><option value="leave">Leave / LWA</option>
+</select><button class="primary" onclick="save()">Save</button><button class="danger" onclick="clearDate()">Clear</button>
+</div>
+<p class="muted">Nothing is assumed. An unmarked day has no effect. You can mark holidays in advance, then change them to Shift if you actually work.</p>
+</div>
+
+<div class="panel">
+<h3 style="margin:0 0 8px">Your starting record</h3>
+<p class="muted">Tracking starts <b>23 June 2026</b>. Only dates you explicitly confirmed are pre-entered: 28 July, 14 August, 20 August, 29 August and 30 August as regular offs. Everything else is blank.</p>
+</div>
+
+<div class="panel">
+<h3 style="margin:0 0 8px">Backup</h3>
+<div class="row"><button onclick="exportData()">Export backup</button><label><button onclick="document.getElementById('file').click()">Import backup</button></label><input id="file" type="file" accept=".json" style="display:none" onchange="importData(event)"></div>
+<p class="muted">Your entries are saved on this device/browser. Export a backup before clearing browser data or changing phones.</p>
+</div>
+</main>
+<script>
+const START="2026-06-23";
+let data=JSON.parse(localStorage.getItem("gdsV2")||"null")||{
+"2026-07-28":"off","2026-08-14":"off","2026-08-20":"off","2026-08-29":"off","2026-08-30":"off"
+};
+let view=new Date(2026,7,30);
+const labels={work:"Shift",off:"Off",holiday:"Holiday",workedholiday:"Worked Holiday",comp:"Comp-off Used",leave:"Leave / LWA",unmarked:"Unmarked"};
+function iso(d){return d.toISOString().slice(0,10)}
+function render(){
+let y=view.getFullYear(),m=view.getMonth();document.getElementById("title").textContent=view.toLocaleString("en-IN",{month:"long",year:"numeric"});
+let el=document.getElementById("days");el.innerHTML="";let first=new Date(y,m,1).getDay(),num=new Date(y,m+1,0).getDate();
+for(let i=0;i<first;i++)el.innerHTML+='<div class="day empty"></div>';
+for(let n=1;n<=num;n++){let d=new Date(y,m,n),s=iso(d),st=data[s]||"unmarked",today=iso(new Date())===s;
+el.innerHTML+=`<div class="day ${st} ${today?'today':''}" onclick="pick('${s}')"><div class="n">${n}</div><div class="tag">${st==='unmarked'?'':labels[st]}</div></div>`}
+recalc();
+}
+function recalc(){
+let d=new Date(START+"T00:00:00"),end=new Date("2026-08-30T00:00:00"),streak=0,pending=0,comp=0;
+while(d<=end){let s=iso(d),x=data[s]||"unmarked";
+if(x==="work"||x==="workedholiday"){streak++;if(x==="workedholiday")comp++;if(streak===6){pending++;streak=0}}
+else if(x==="off"){if(pending>0)pending--;streak=0}
+else if(x==="comp"){if(comp>0)comp--;streak=0}
+else if(x==="leave"){streak=0}
+d.setDate(d.getDate()+1)}
+document.getElementById("pending").textContent=pending;document.getElementById("streak").textContent=streak+" / 6";document.getElementById("comp").textContent=comp;
+}
+function pick(s){document.getElementById("date").value=s;document.getElementById("status").value=data[s]||"unmarked"}
+function save(){let s=document.getElementById("date").value;if(!s)return;let x=document.getElementById("status").value;if(x==="unmarked")delete data[s];else data[s]=x;localStorage.setItem("gdsV2",JSON.stringify(data));render()}
+function clearDate(){let s=document.getElementById("date").value;if(!s)return;delete data[s];localStorage.setItem("gdsV2",JSON.stringify(data));render()}
+function move(x){view=new Date(view.getFullYear(),view.getMonth()+x,1);render()}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="gds-tracker-backup.json";a.click();URL.revokeObjectURL(a.href)}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);localStorage.setItem("gdsV2",JSON.stringify(data));render()}catch(err){alert("Invalid backup file")}};r.readAsText(f)}
+document.getElementById("date").value="2026-08-30";render();
+</script></body></html>
