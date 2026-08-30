@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#111827">
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>GDS Off Tracker</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f4f5f7;color:#18202a;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
@@ -52,11 +52,14 @@ button{border:1px solid #d8dde3;border-radius:9px;background:#fff;padding:8px 10
 </section>
 
 <section class="panel">
-<h3 style="margin:0 0 7px">Backup</h3>
-<button id="export" type="button">Export backup</button>
+<h3 style="margin:0 0 7px">Phone backup & app</h3>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button id="export" type="button">💾 Save backup to phone</button>
+<button id="import" type="button">↩ Restore from phone</button>
+<button id="install" type="button" style="display:none">📲 Install app</button>
+</div>
 <input id="importFile" type="file" accept=".json" hidden>
-<button id="import" type="button">Import backup</button>
-<p class="muted">Your calendar entries are stored in this browser. Export a backup before clearing browser data or changing phones.</p>
+<p class="muted">Save a backup whenever you want. It downloads a small JSON file to your phone's Downloads/files folder. If you change phones, use Restore from phone. The tracker is also installable as a proper home-screen app.</p>
 </section>
 </main>
 
