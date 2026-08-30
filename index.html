@@ -7,7 +7,7 @@ header{background:#111827;color:#fff;padding:18px 16px}h1{margin:0;font-size:22p
 main{max-width:900px;margin:auto;padding:14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.card,.panel{background:#fff;border:1px solid #e0e4e8;border-radius:14px;padding:13px}.label{font-size:11px;color:#6b7280}.value{font-size:24px;font-weight:800;margin-top:3px}
 .calendar{margin-top:12px}.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.nav button,button,select,input{border:1px solid #d8dde3;border-radius:9px;background:#fff;padding:8px 10px;font:inherit}.month{font-weight:800}
 .dow,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.dow div{text-align:center;color:#68727d;font-size:11px;padding:4px}.day{min-height:70px;border:1px solid #dfe3e8;border-radius:9px;padding:6px;cursor:pointer;background:#fff}.day.empty{border:0;background:transparent}.day .n{font-weight:750;font-size:13px}.tag{font-size:9px;margin-top:7px;line-height:1.2}.work{background:#eef6ff}.off{background:#eefbf1}.holiday{background:#fff8df}.comp{background:#f3edff}.leave{background:#fff0f0}.workedholiday{background:#e9f8f5}
-.today{outline:2px solid #2457d6}.future{opacity:.9}.muted{color:#6b7280;font-size:12px}.panel{margin-top:12px}.row{display:flex;gap:8px;flex-wrap:wrap}.primary{background:#2457d6;color:white;border-color:#2457d6}.danger{color:#a11;background:#fff}.legend{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.pill{font-size:10px;padding:5px 8px;border:1px solid #e0e4e8;border-radius:99px}
+.today{outline:2px solid #2457d6}.future{opacity:.9}.muted{color:#6b7280;font-size:12px}.panel{margin-top:12px}.row{display:flex;gap:8px;flex-wrap:wrap}.primary{background:#2457d6;color:white;border-color:#2457d6}.danger{color:#a11;background:#fff} #menu button{display:block;width:100%;text-align:left;border:0;background:#fff;padding:10px 9px;border-radius:8px;font-size:14px} #menu button:active{background:#f0f2f5}.legend{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.pill{font-size:10px;padding:5px 8px;border:1px solid #e0e4e8;border-radius:99px}
 @media(max-width:600px){.stats{grid-template-columns:1fr 1fr}.stats .card:last-child{grid-column:1/-1}.day{min-height:61px}.tag{font-size:8px}}
 </style></head>
 <body>
@@ -27,18 +27,24 @@ main{max-width:900px;margin:auto;padding:14px}.stats{display:grid;grid-template-
 </div>
 
 <div class="panel">
-<h3 style="margin:0 0 10px">Mark a date</h3>
-<div class="row">
-<input type="date" id="date"><select id="status">
-<option value="unmarked">Unmarked</option><option value="work">Shift</option><option value="off">Regular Off</option><option value="holiday">Holiday</option><option value="workedholiday">Worked Holiday (+ comp-off)</option><option value="comp">Comp-off Used</option><option value="leave">Leave / LWA</option>
-</select><button class="primary" onclick="save()">Save</button><button class="danger" onclick="clearDate()">Clear</button>
+<h3 style="margin:0 0 8px">How to mark a day</h3>
+<p class="muted"><b>Long-press</b> any date on the calendar to open the status menu. On desktop, right-click a date. Tap a status to save it. Tap outside the menu to close it.</p>
 </div>
-<p class="muted">Nothing is assumed. An unmarked day has no effect. Mark a holiday yourself, and if you work it, change it to <b>Worked Holiday</b>.</p>
+
+<div id="menu" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #d8dde3;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.16);padding:8px;min-width:190px">
+<div id="menuDate" style="font-weight:800;padding:7px 9px 5px"></div>
+<button type="button" data-set="work">🟦 Shift</button>
+<button type="button" data-set="off">🟩 Regular Off</button>
+<button type="button" data-set="holiday">🟨 Holiday</button>
+<button type="button" data-set="workedholiday">🟫 Worked Holiday (+ comp-off)</button>
+<button type="button" data-set="comp">🟪 Comp-off Used</button>
+<button type="button" data-set="leave">🟥 Leave / LWA</button>
+<button type="button" data-set="unmarked">Clear</button>
 </div>
 
 <div class="panel">
 <h3 style="margin:0 0 8px">Your starting record</h3>
-<p class="muted">Tracking starts <b>23 June 2026</b>. Only dates you explicitly confirmed are pre-entered: 28 July, 14 August, 20 August, 29 August and 30 August as regular offs. Everything else is blank. The tracker also starts with your confirmed 1 carried-forward regular off from 30 August.</p>
+<p class="muted">Parcel Hub tracking starts <b>23 July 2026</b>. Your confirmed Parcel Hub history is preloaded: 32 shifts from 23 July–29 August, offs on 28 July, 14 August, 20 August and 29 August, holidays on 15 and 26 August, plus the 30 August off. The tracker also starts with your confirmed 1 carried-forward regular off.</p>
 </div>
 
 <div class="panel">
@@ -49,9 +55,11 @@ main{max-width:900px;margin:auto;padding:14px}.stats{display:grid;grid-template-
 </main>
 <script>
 const START="2026-06-23";
-let data=JSON.parse(localStorage.getItem("gdsV4")||"null")||{
-"2026-07-28":"off","2026-08-14":"off","2026-08-20":"off","2026-08-29":"off","2026-08-30":"off"
+let data=JSON.parse(localStorage.getItem("gdsV5")||"null")||{
+"2026-07-28":"off","2026-08-14":"off","2026-08-20":"off","2026-08-29":"off","2026-08-30":"off",
+"2026-08-15":"holiday","2026-08-26":"holiday"
 };
+Object.assign(data,{"2026-07-23":"work","2026-07-24":"work","2026-07-25":"work","2026-07-26":"work","2026-07-27":"work","2026-07-29":"work","2026-07-30":"work","2026-07-31":"work","2026-08-01":"work","2026-08-02":"work","2026-08-03":"work","2026-08-04":"work","2026-08-05":"work","2026-08-06":"work","2026-08-07":"work","2026-08-08":"work","2026-08-09":"work","2026-08-10":"work","2026-08-11":"work","2026-08-12":"work","2026-08-13":"work","2026-08-16":"work","2026-08-17":"work","2026-08-18":"work","2026-08-19":"work","2026-08-21":"work","2026-08-22":"work","2026-08-23":"work","2026-08-24":"work","2026-08-25":"work","2026-08-27":"work","2026-08-28":"work"});
 let view=new Date(2026,7,30);
 const labels={work:"Shift",off:"Off",holiday:"Holiday",workedholiday:"Worked Holiday",comp:"Comp-off Used",leave:"Leave / LWA",unmarked:"Unmarked"};
 function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
@@ -60,38 +68,65 @@ let y=view.getFullYear(),m=view.getMonth();document.getElementById("title").text
 let el=document.getElementById("days");el.innerHTML="";let first=new Date(y,m,1).getDay(),num=new Date(y,m+1,0).getDate();
 for(let i=0;i<first;i++)el.innerHTML+='<div class="day empty"></div>';
 for(let n=1;n<=num;n++){let d=new Date(y,m,n),s=iso(d),st=data[s]||"unmarked",today=iso(new Date())===s;
-el.innerHTML+=`<div class="day ${st} ${today?'today':''}" onclick="pick('${s}')"><div class="n">${n}</div><div class="tag">${st==='unmarked'?'':labels[st]}</div></div>`}
+el.innerHTML+=`<div class="day ${st} ${today?'today':''}" data-date="${s}"><div class="n">${n}</div><div class="tag">${st==='unmarked'?'':labels[st]}</div></div>`}
 recalc();
+ bindDayInteractions();
 }
 function recalc(){
- let dates=Object.keys(data).filter(s=>s>="2026-06-23").sort();
- let earned=1; // known carried-forward regular off as of 30 Aug 2026
- let streak=0,comp=0;
+ let dates=Object.keys(data).filter(s=>s>="2026-07-23").sort();
+ let earned=1,streak=0,comp=0;
  for(const s of dates){
-   let x=data[s]||"unmarked";
-   if(x==="work"||x==="workedholiday"){
-     streak++;
-     if(x==="workedholiday") comp++;
-     if(streak===6){earned++;streak=0}
-   } else if(x==="off"){
-     if(earned>0) earned--;
-     streak=0;
-   } else if(x==="comp"){
-     if(comp>0) comp--;
-     streak=0;
-   } else if(x==="leave"){
-     streak=0;
-   }
+  const x=data[s]||"unmarked";
+  if(x==="work"||x==="workedholiday"){
+   streak++; if(x==="workedholiday")comp++;
+   if(streak===6){earned++;streak=0}
+  } else if(x==="off"){if(earned>0)earned--;streak=0}
+  else if(x==="comp"){if(comp>0)comp--;streak=0}
+  else if(x==="leave"){streak=0}
  }
  document.getElementById("pending").textContent=earned;
  document.getElementById("streak").textContent=streak+" / 6";
  document.getElementById("comp").textContent=comp;
 }
-function pick(s){document.getElementById("date").value=s;document.getElementById("status").value=data[s]||"unmarked"}
-function save(){let s=document.getElementById("date").value;if(!s)return;let x=document.getElementById("status").value;if(x==="unmarked")delete data[s];else data[s]=x;localStorage.setItem("gdsV4",JSON.stringify(data));render()}
-function clearDate(){let s=document.getElementById("date").value;if(!s)return;delete data[s];localStorage.setItem("gdsV4",JSON.stringify(data));render()}
-function move(x){view=new Date(view.getFullYear(),view.getMonth()+x,1);render()}
+let pressTimer=null, pressedDate=null, startX=0, startY=0;
+function openMenu(date,x,y){
+ pressedDate=date;
+ document.getElementById("menuDate").textContent=new Date(date+"T00:00:00").toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"});
+ const menu=document.getElementById("menu");
+ menu.style.display="block";
+ const w=menu.offsetWidth||210,h=menu.offsetHeight||320;
+ menu.style.left=Math.max(8,Math.min(x,window.innerWidth-w-8))+"px";
+ menu.style.top=Math.max(8,Math.min(y,window.innerHeight-h-8))+"px";
+}
+function closeMenu(){document.getElementById("menu").style.display="none";pressedDate=null}
+function bindDayInteractions(){
+ document.querySelectorAll(".day[data-date]").forEach(day=>{
+   day.addEventListener("pointerdown",e=>{
+     if(e.pointerType==="mouse" && e.button!==0)return;
+     startX=e.clientX;startY=e.clientY;
+     clearTimeout(pressTimer);
+     pressTimer=setTimeout(()=>openMenu(day.dataset.date,startX,startY),500);
+   });
+   day.addEventListener("pointermove",e=>{
+     if(Math.hypot(e.clientX-startX,e.clientY-startY)>12)clearTimeout(pressTimer);
+   });
+   day.addEventListener("pointerup",()=>clearTimeout(pressTimer));
+   day.addEventListener("pointercancel",()=>clearTimeout(pressTimer));
+   day.addEventListener("contextmenu",e=>{e.preventDefault();openMenu(day.dataset.date,e.clientX,e.clientY)});
+ });
+}
+function setDateStatus(st){
+ if(!pressedDate)return;
+ if(st==="unmarked")delete data[pressedDate]; else data[pressedDate]=st;
+ localStorage.setItem("gdsV5",JSON.stringify(data));
+ closeMenu(); render();
+}
+document.querySelectorAll("#menu [data-set]").forEach(btn=>btn.addEventListener("click",()=>setDateStatus(btn.dataset.set)));
+document.addEventListener("pointerdown",e=>{
+ const menu=document.getElementById("menu");
+ if(menu.style.display!=="none" && !menu.contains(e.target) && !e.target.closest(".day[data-date]"))closeMenu();
+});
 function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="gds-tracker-backup.json";a.click();URL.revokeObjectURL(a.href)}
-function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);localStorage.setItem("gdsV4",JSON.stringify(data));render()}catch(err){alert("Invalid backup file")}};r.readAsText(f)}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);localStorage.setItem("gdsV5",JSON.stringify(data));render()}catch(err){alert("Invalid backup file")}};r.readAsText(f)}
 document.getElementById("date").value="2026-08-30";render();
 </script></body></html>

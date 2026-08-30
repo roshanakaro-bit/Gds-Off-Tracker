@@ -1,9 +1,1 @@
-{
-  "name": "GDS Off Tracker",
-  "short_name": "GDS Tracker",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#f4f5f7",
-  "theme_color": "#111827",
-  "description": "Manual GDS duty, regular-off and compensatory-leave tracker"
-}
+{"name": "GDS Off Tracker", "short_name": "GDS Tracker", "start_url": "./", "display": "standalone", "background_color": "#f4f5f7", "theme_color": "#111827"}
