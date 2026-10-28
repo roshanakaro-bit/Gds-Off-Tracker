@@ -4,51 +4,111 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#111827">
-<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>GDS Off Tracker</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f4f5f7;color:#18202a;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
-header{background:#111827;color:#fff;padding:18px 16px}header h1{margin:0;font-size:22px}header p{margin:4px 0 0;color:#cbd5e1;font-size:13px}
-main{max-width:900px;margin:auto;padding:14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
-.card,.panel{background:#fff;border:1px solid #dfe3e8;border-radius:14px;padding:13px}.label{font-size:11px;color:#6b7280}.value{font-size:24px;font-weight:800;margin-top:3px}
-.calendar{margin-top:12px}.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.nav button{width:44px;height:44px}
-button{border:1px solid #d8dde3;border-radius:9px;background:#fff;padding:8px 10px;font:inherit;min-height:44px}.month{font-weight:800}
-.dow,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.dow div{text-align:center;color:#68727d;font-size:11px;padding:4px}
+*{box-sizing:border-box}
+body{margin:0;background:#f4f5f7;color:#18202a;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:#111827;color:#fff;padding:18px 16px}
+header h1{margin:0;font-size:22px}
+header p{margin:4px 0 0;color:#cbd5e1;font-size:13px}
+main{max-width:900px;margin:auto;padding:14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.card,.panel{background:#fff;border:1px solid #dfe3e8;border-radius:14px;padding:13px}
+.label{font-size:11px;color:#6b7280}
+.value{font-size:24px;font-weight:800;margin-top:3px;overflow-wrap:anywhere}
+.calendar{margin-top:12px}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.nav button{width:44px;height:44px}
+button{border:1px solid #d8dde3;border-radius:9px;background:#fff;padding:8px 10px;font:inherit;min-height:44px}
+.month{font-weight:800}
+.dow,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.dow div{text-align:center;color:#68727d;font-size:11px;padding:4px}
 .day{min-height:70px;border:1px solid #dfe3e8;border-radius:9px;padding:6px;cursor:pointer;background:#fff;touch-action:manipulation;user-select:none}
-.day.empty{border:0;background:transparent;cursor:default}.day .n{font-weight:750;font-size:13px}.tag{font-size:9px;margin-top:7px;line-height:1.2}
-.work{background:#eef6ff}.off{background:#eefbf1}.holiday{background:#fff8df}.comp{background:#f3edff}.leave{background:#fff0f0}.workedholiday{background:#e9f8f5}.today{outline:2px solid #2457d6}
-.muted{color:#6b7280;font-size:12px;line-height:1.45}.legend{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.pill{font-size:10px;padding:5px 8px;border:1px solid #e0e4e8;border-radius:99px}
+.day.empty{border:0;background:transparent;cursor:default}
+.day .n{font-weight:750;font-size:13px}
+.tag{font-size:9px;margin-top:7px;line-height:1.2;overflow-wrap:anywhere}
+.work{background:#eef6ff}
+.off{background:#eefbf1}
+.holiday{background:#fff8df}
+.comp{background:#f3edff}
+.leave{background:#fff0f0}
+.workedholiday{background:#e9f8f5}
+.today{outline:2px solid #2457d6;outline-offset:-2px}
+.muted{color:#6b7280;font-size:12px;line-height:1.45}
+.legend{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.pill{font-size:10px;padding:5px 8px;border:1px solid #e0e4e8;border-radius:99px}
 #menu{display:none;position:fixed;z-index:50;background:#fff;border:1px solid #d8dde3;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.18);padding:8px;min-width:220px}
-#menu h3{margin:4px 9px 8px;font-size:14px}#menu button{display:block;width:100%;text-align:left;border:0;padding:10px 9px;border-radius:8px;font-size:14px}
+#menu h3{margin:4px 9px 8px;font-size:14px}
+#menu button{display:block;width:100%;text-align:left;border:0;padding:10px 9px;border-radius:8px;font-size:14px}
 #menu button:active{background:#eef1f4}
-@media(max-width:600px){.stats{grid-template-columns:1fr 1fr}.stats .card:last-child{grid-column:1/-1}.day{min-height:62px}.tag{font-size:8px}}
+@media(max-width:600px){
+ .stats{grid-template-columns:1fr 1fr}
+ .stats .card:last-child{grid-column:1/-1}
+ .day{min-height:62px;padding:4px}
+ .tag{font-size:8px}
+}
 </style>
 </head>
+
 <body>
-<header><h1>GDS Off Tracker</h1><p>Manual calendar • 6 shifts → 1 regular off • long-press a date to mark it</p></header>
+<header>
+<h1>GDS Off Tracker</h1>
+<p>Manual calendar • 6 shifts → 1 regular off • long-press a date to mark it</p>
+</header>
+
 <main>
 <section class="stats">
-<div class="card"><div class="label">Pending regular offs</div><div class="value" id="pending">1</div></div>
-<div class="card"><div class="label">Shift progress</div><div class="value" id="streak">2 / 6</div></div>
-<div class="card"><div class="label">Comp-offs</div><div class="value" id="comp">0</div></div>
+<div class="card">
+<div class="label">Pending regular offs</div>
+<div class="value" id="pending">1</div>
+</div>
+<div class="card">
+<div class="label">Shift progress</div>
+<div class="value" id="streak">2 / 6</div>
+</div>
+<div class="card">
+<div class="label">Comp-offs</div>
+<div class="value" id="comp">0</div>
+</div>
 </section>
 
 <section class="panel calendar">
-<div class="nav"><button id="prev" type="button" aria-label="Previous month">‹</button><div class="month" id="title"></div><button id="next" type="button" aria-label="Next month">›</button></div>
-<div class="dow"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
+<div class="nav">
+<button id="prev" type="button" aria-label="Previous month">‹</button>
+<div class="month" id="title"></div>
+<button id="next" type="button" aria-label="Next month">›</button>
+</div>
+
+<div class="dow">
+<div>Sun</div><div>Mon</div><div>Tue</div>
+<div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+</div>
 <div class="days" id="days"></div>
-<div class="legend"><span class="pill">🟦 Shift</span><span class="pill">🟩 Off</span><span class="pill">🟨 Holiday</span><span class="pill">🟫 Worked holiday</span><span class="pill">🟪 Comp-off used</span><span class="pill">🟥 Leave</span></div>
+
+<div class="legend">
+<span class="pill">🟦 Shift</span>
+<span class="pill">🟩 Off</span>
+<span class="pill">🟨 Holiday</span>
+<span class="pill">🟫 Worked holiday</span>
+<span class="pill">🟪 Comp-off used</span>
+<span class="pill">🟥 Leave</span>
+</div>
 </section>
 
 <section class="panel">
 <h3 style="margin:0 0 7px">How it works</h3>
-<p class="muted"><b>Long-press</b> a date to open the status menu. An ordinary tap does nothing, so you won't accidentally change a day. You can mark future holidays in advance and later change them to Shift or Worked Holiday.</p>
-<p class="muted"><b>Regular offs are cumulative:</b> every 6 actual shifts adds one earned off. Holidays and leave do not count as shifts. Taking an off reduces the pending bank by one. Working a holiday counts as a shift and also adds one separate comp-off.</p>
+<p class="muted"><b>Long-press</b> a date to open the status menu. An ordinary tap does nothing. You can mark future holidays in advance and later change them to Shift or Worked Holiday.</p>
+<p class="muted"><b>Regular offs:</b> every 6 actual shifts adds one earned off. Taking an off reduces your balance by one, even if it becomes negative. Future earned offs increase the balance and gradually clear the deficit.</p>
+<p class="muted"><b>Comp-offs:</b> working a holiday counts as a shift and adds one comp-off. Using a comp-off subtracts one even if your balance is zero or already negative. Future worked holidays increase the balance.</p>
+<p class="muted">Holidays and leave do not count as shifts unless marked Worked Holiday. Shift progress shows your six-shift cycle, not the off balance.</p>
 </section>
 
 <section class="panel">
 <h3 style="margin:0 0 7px">Parcel Hub starting record</h3>
-<p class="muted">Tracking begins <b>23 July 2026</b>. The confirmed history is preloaded: 32 shifts from 23 July–29 August, offs on 28 July, 14 August, 20 August and 29 August, holidays on 15 and 26 August, and the 30 August off. A confirmed <b>1 carried-forward regular off</b> is included in the starting balance. No unconfirmed dates are invented.</p>
+<p class="muted">Tracking begins <b>23 July 2026</b>. The confirmed history is preloaded: 32 shifts from 23 July–29 August, offs on 28 July, 14 August, 20 August and 29 August, holidays on 15 and 26 August, and the 30 August off. A confirmed <b>1 carried-forward regular off</b> is included in the starting balance.</p>
 </section>
 
 <section class="panel">
@@ -59,7 +119,7 @@ button{border:1px solid #d8dde3;border-radius:9px;background:#fff;padding:8px 10
 <button id="install" type="button" style="display:none">📲 Install app</button>
 </div>
 <input id="importFile" type="file" accept=".json" hidden>
-<p class="muted">Save a backup whenever you want. It downloads a small JSON file to your phone's Downloads/files folder. If you change phones, use Restore from phone. The tracker is also installable as a proper home-screen app.</p>
+<p class="muted">Save a backup whenever you want. It downloads a small JSON file to your phone's Downloads/files folder. If you change phones, use Restore from phone. The tracker is also installable as a home-screen app.</p>
 </section>
 </main>
 
@@ -77,96 +137,262 @@ button{border:1px solid #d8dde3;border-radius:9px;background:#fff;padding:8px 10
 <script>
 (function(){
 "use strict";
+
 const KEY="gdsV7";
 let data=JSON.parse(localStorage.getItem(KEY)||"null");
-if(!data) data={"2026-07-28":"off","2026-08-14":"off","2026-08-20":"off","2026-08-29":"off","2026-08-30":"off","2026-08-15":"holiday","2026-08-26":"holiday","2026-07-23":"work","2026-07-24":"work","2026-07-25":"work","2026-07-26":"work","2026-07-27":"work","2026-07-29":"work","2026-07-30":"work","2026-07-31":"work","2026-08-01":"work","2026-08-02":"work","2026-08-03":"work","2026-08-04":"work","2026-08-05":"work","2026-08-06":"work","2026-08-07":"work","2026-08-08":"work","2026-08-09":"work","2026-08-10":"work","2026-08-11":"work","2026-08-12":"work","2026-08-13":"work","2026-08-16":"work","2026-08-17":"work","2026-08-18":"work","2026-08-19":"work","2026-08-21":"work","2026-08-22":"work","2026-08-23":"work","2026-08-24":"work","2026-08-25":"work","2026-08-27":"work","2026-08-28":"work"};
+
+if(!data) data={
+"2026-07-28":"off",
+"2026-08-14":"off",
+"2026-08-20":"off",
+"2026-08-29":"off",
+"2026-08-30":"off",
+"2026-08-15":"holiday",
+"2026-08-26":"holiday",
+"2026-07-23":"work",
+"2026-07-24":"work",
+"2026-07-25":"work",
+"2026-07-26":"work",
+"2026-07-27":"work",
+"2026-07-29":"work",
+"2026-07-30":"work",
+"2026-07-31":"work",
+"2026-08-01":"work",
+"2026-08-02":"work",
+"2026-08-03":"work",
+"2026-08-04":"work",
+"2026-08-05":"work",
+"2026-08-06":"work",
+"2026-08-07":"work",
+"2026-08-08":"work",
+"2026-08-09":"work",
+"2026-08-10":"work",
+"2026-08-11":"work",
+"2026-08-12":"work",
+"2026-08-13":"work",
+"2026-08-16":"work",
+"2026-08-17":"work",
+"2026-08-18":"work",
+"2026-08-19":"work",
+"2026-08-21":"work",
+"2026-08-22":"work",
+"2026-08-23":"work",
+"2026-08-24":"work",
+"2026-08-25":"work",
+"2026-08-27":"work",
+"2026-08-28":"work"
+};
 
 const START="2026-07-23";
-const labels={work:"Shift",off:"Off",holiday:"Holiday",workedholiday:"Worked Holiday",comp:"Comp-off Used",leave:"Leave / LWA"};
+const labels={
+work:"Shift",
+off:"Off",
+holiday:"Holiday",
+workedholiday:"Worked Holiday",
+comp:"Comp-off Used",
+leave:"Leave / LWA"
+};
 
-/* Automatically open the calendar on the current local month */
 const now=new Date();
-let view=new Date(now.getFullYear(),now.getMonth(),1), pressedDate=null, timer=null, sx=0, sy=0;
+let view=new Date(now.getFullYear(),now.getMonth(),1);
+let pressedDate=null,timer=null,sx=0,sy=0;
 
 function pad(n){return String(n).padStart(2,"0")}
 function key(y,m,d){return y+"-"+pad(m)+"-"+pad(d)}
-function parseKey(s){const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
-function saveData(){localStorage.setItem(KEY,JSON.stringify(data))}
+function parseKey(s){
+ const [y,m,d]=s.split("-").map(Number);
+ return new Date(y,m-1,d);
+}
+function saveData(){
+ localStorage.setItem(KEY,JSON.stringify(data));
+}
+
 function calc(){
- let earned=1, shifts=0, comp=0;
+ // Start with the confirmed carried-forward regular off.
+ // Do not block negative balances.
+ let earned=1,shifts=0,comp=0;
+
  const dates=Object.keys(data).filter(s=>s>=START).sort();
+
  for(const s of dates){
-   const x=data[s];
-   if(x==="work"||x==="workedholiday"){
-     shifts++;
-     if(x==="workedholiday") comp++;
-     if(shifts%6===0) earned++;
-   } else if(x==="off"){
-     if(earned>0) earned--;
-   } else if(x==="comp"){
-     if(comp>0) comp--;
-   }
+  const x=data[s];
+
+  if(x==="work"||x==="workedholiday"){
+   shifts++;
+   if(x==="workedholiday")comp++;
+   if(shifts%6===0)earned++;
+  }else if(x==="off"){
+   // Every recorded regular off counts, even below zero.
+   earned--;
+  }else if(x==="comp"){
+   // Every recorded comp-off use counts, even below zero.
+   comp--;
+  }
  }
+
  document.getElementById("pending").textContent=earned;
  document.getElementById("streak").textContent=(shifts%6)+" / 6";
  document.getElementById("comp").textContent=comp;
 }
+
 function render(){
  const y=view.getFullYear(),m=view.getMonth()+1;
- document.getElementById("title").textContent=view.toLocaleString("en-IN",{month:"long",year:"numeric"});
- const el=document.getElementById("days");el.innerHTML="";
- const first=new Date(y,m-1,1).getDay(), count=new Date(y,m,0).getDate();
- for(let i=0;i<first;i++){const e=document.createElement("div");e.className="day empty";el.appendChild(e)}
- const today=new Date();const todayKey=key(today.getFullYear(),today.getMonth()+1,today.getDate());
- for(let d=1;d<=count;d++){
-   const s=key(y,m,d), st=data[s]||"";
-   const cell=document.createElement("div");cell.className="day "+(st||"")+(s===todayKey?" today":"");cell.dataset.date=s;
-   const n=document.createElement("div");n.className="n";n.textContent=d;cell.appendChild(n);
-   const tag=document.createElement("div");tag.className="tag";tag.textContent=st?labels[st]:"";cell.appendChild(tag);
-   el.appendChild(cell);
+
+ document.getElementById("title").textContent=
+  view.toLocaleString("en-IN",{month:"long",year:"numeric"});
+
+ const el=document.getElementById("days");
+ el.innerHTML="";
+
+ const first=new Date(y,m-1,1).getDay();
+ const count=new Date(y,m,0).getDate();
+
+ for(let i=0;i<first;i++){
+  const e=document.createElement("div");
+  e.className="day empty";
+  el.appendChild(e);
  }
- calc(); bind();
+
+ const today=new Date();
+ const todayKey=key(today.getFullYear(),today.getMonth()+1,today.getDate());
+
+ for(let d=1;d<=count;d++){
+  const s=key(y,m,d),st=data[s]||"";
+  const cell=document.createElement("div");
+  cell.className="day "+(st||"")+(s===todayKey?" today":"");
+  cell.dataset.date=s;
+
+  const n=document.createElement("div");
+  n.className="n";
+  n.textContent=d;
+  cell.appendChild(n);
+
+  const tag=document.createElement("div");
+  tag.className="tag";
+  tag.textContent=st?labels[st]:"";
+  cell.appendChild(tag);
+
+  el.appendChild(cell);
+ }
+
+ calc();
+ bind();
 }
+
 function bind(){
  document.querySelectorAll(".day[data-date]").forEach(cell=>{
-   cell.addEventListener("pointerdown",e=>{
-     sx=e.clientX;sy=e.clientY;clearTimeout(timer);
-     timer=setTimeout(()=>openMenu(cell.dataset.date,sx,sy),500);
-   });
-   cell.addEventListener("pointermove",e=>{if(Math.hypot(e.clientX-sx,e.clientY-sy)>14)clearTimeout(timer)});
-   cell.addEventListener("pointerup",()=>clearTimeout(timer));
-   cell.addEventListener("pointercancel",()=>clearTimeout(timer));
-   cell.addEventListener("contextmenu",e=>{e.preventDefault();openMenu(cell.dataset.date,e.clientX,e.clientY)});
+  cell.addEventListener("pointerdown",e=>{
+   sx=e.clientX;
+   sy=e.clientY;
+   clearTimeout(timer);
+   timer=setTimeout(()=>openMenu(cell.dataset.date,sx,sy),500);
+  });
+
+  cell.addEventListener("pointermove",e=>{
+   if(Math.hypot(e.clientX-sx,e.clientY-sy)>14)
+    clearTimeout(timer);
+  });
+
+  cell.addEventListener("pointerup",()=>clearTimeout(timer));
+  cell.addEventListener("pointercancel",()=>clearTimeout(timer));
+
+  cell.addEventListener("contextmenu",e=>{
+   e.preventDefault();
+   openMenu(cell.dataset.date,e.clientX,e.clientY);
+  });
  });
 }
+
 function openMenu(s,x,y){
- pressedDate=s;const menu=document.getElementById("menu");
- document.getElementById("menuDate").textContent=parseKey(s).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"});
+ pressedDate=s;
+ const menu=document.getElementById("menu");
+
+ document.getElementById("menuDate").textContent=
+  parseKey(s).toLocaleDateString("en-IN",{
+   day:"numeric",month:"short",year:"numeric"
+  });
+
  menu.style.display="block";
+
  const w=menu.offsetWidth,h=menu.offsetHeight;
  menu.style.left=Math.max(8,Math.min(x,window.innerWidth-w-8))+"px";
  menu.style.top=Math.max(8,Math.min(y,window.innerHeight-h-8))+"px";
 }
-function closeMenu(){document.getElementById("menu").style.display="none";pressedDate=null}
-document.querySelectorAll("#menu [data-status]").forEach(btn=>btn.addEventListener("click",()=>{
- if(!pressedDate)return;
- const st=btn.dataset.status;
- if(st==="clear")delete data[pressedDate];else data[pressedDate]=st;
- saveData();closeMenu();render();
-}));
-document.addEventListener("pointerdown",e=>{const menu=document.getElementById("menu");if(menu.style.display==="block"&&!menu.contains(e.target)&&!e.target.closest(".day[data-date]"))closeMenu()});
-document.getElementById("prev").addEventListener("click",()=>{view=new Date(view.getFullYear(),view.getMonth()-1,1);render()});
-document.getElementById("next").addEventListener("click",()=>{view=new Date(view.getFullYear(),view.getMonth()+1,1);render()});
-document.getElementById("export").addEventListener("click",()=>{
- const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
- const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="gds-tracker-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);
+
+function closeMenu(){
+ document.getElementById("menu").style.display="none";
+ pressedDate=null;
+}
+
+document.querySelectorAll("#menu [data-status]").forEach(btn=>{
+ btn.addEventListener("click",()=>{
+  if(!pressedDate)return;
+
+  const st=btn.dataset.status;
+  if(st==="clear")delete data[pressedDate];
+  else data[pressedDate]=st;
+
+  saveData();
+  closeMenu();
+  render();
+ });
 });
-document.getElementById("import").addEventListener("click",()=>document.getElementById("importFile").click());
+
+document.addEventListener("pointerdown",e=>{
+ const menu=document.getElementById("menu");
+ if(menu.style.display==="block"&&
+    !menu.contains(e.target)&&
+    !e.target.closest(".day[data-date]")){
+  closeMenu();
+ }
+});
+
+document.getElementById("prev").addEventListener("click",()=>{
+ view=new Date(view.getFullYear(),view.getMonth()-1,1);
+ render();
+});
+
+document.getElementById("next").addEventListener("click",()=>{
+ view=new Date(view.getFullYear(),view.getMonth()+1,1);
+ render();
+});
+
+document.getElementById("export").addEventListener("click",()=>{
+ const blob=new Blob([JSON.stringify(data,null,2)],{
+  type:"application/json"
+ });
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);
+ a.download="gds-tracker-backup.json";
+ a.click();
+ setTimeout(()=>URL.revokeObjectURL(a.href),500);
+});
+
+document.getElementById("import").addEventListener("click",()=>{
+ document.getElementById("importFile").click();
+});
+
 document.getElementById("importFile").addEventListener("change",e=>{
- const f=e.target.files[0];if(!f)return;const r=new FileReader();
- r.onload=()=>{try{data=JSON.parse(r.result);saveData();render()}catch(err){alert("Invalid backup file")}};
+ const f=e.target.files[0];
+ if(!f)return;
+
+ const r=new FileReader();
+ r.onload=()=>{
+  try{
+   const imported=JSON.parse(r.result);
+   if(!imported||typeof imported!=="object"||Array.isArray(imported))
+    throw new Error("Invalid data");
+   data=imported;
+   saveData();
+   render();
+  }catch(err){
+   alert("Invalid backup file");
+  }
+  e.target.value="";
+ };
  r.readAsText(f);
 });
+
 render();
 })();
 </script>
